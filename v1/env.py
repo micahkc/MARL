@@ -74,7 +74,6 @@ class Environment():
         return sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     def step(self, actions):
-        """
         # updates the enviroment given new control input (check for collisions)
         # return rewards, observations, completion for given action 
         # Update drone positions.
@@ -102,85 +101,87 @@ class Environment():
             self.drones[i].v_x = x
             self.drones[i].v_y = y
 
-        # Check for collisions now that drones are in new positions.
-        drones_to_remove = set()
-        rewards = [0 for 0 in len(self.drones)]
-        for i, drone in enumerate(self.drones):
-            if drone.active:
-                # Check for drone going off screen.
-                if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
-                    drones_to_remove.add(i)
+        # # Check for collisions now that drones are in new positions.
+        # drones_to_remove = set()
+        # rewards = [0 for 0 in len(self.drones)]
+        # for i, drone in enumerate(self.drones):
+        #     if drone.active:
+        #         # Check for drone going off screen.
+        #         if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
+        #             drones_to_remove.add(i)
 
-                # Check for obstacle collision.
-                elif self.check_obstacle_collision(drone.x, drone.y, drone.radius):
-                    drones_to_remove.add(i)
+        #         # Check for obstacle collision.
+        #         elif self.check_obstacle_collision(drone.x, drone.y, drone.radius):
+        #             drones_to_remove.add(i)
                 
-                # Check for drone-drone collision.
-                # Compare with other drones, not itself.
-                elif self.check_drone_collision(drone.x, drone.y, drone.radius, drone.id):
-                    drones_to_remove.add(i)
+        #         # Check for drone-drone collision.
+        #         # Compare with other drones, not itself.
+        #         elif self.check_drone_collision(drone.x, drone.y, drone.radius, drone.id):
+        #             drones_to_remove.add(i)
 
-                # Check for target acheivement.
-                else:
-                    for target in self.targets:
-                        if self.distance(drone.x, drone.y, target.x, target.y) < (drone.radius + target.r):
-                            rewards[i] += 1
-                            self.targets.remove(target)
+        #         # Check for target acheivement.
+        #         else:
+        #             for target in self.targets:
+        #                 if self.distance(drone.x, drone.y, target.x, target.y) < (drone.radius + target.r):
+        #                     rewards[i] += 1
+        #                     self.targets.remove(target)
 
-        # Remove collided drones.
-        for i in drones_to_remove:
-            self.drones[i].active = False
+        # # Remove collided drones.
+        # for i in drones_to_remove:
+        #     self.drones[i].active = False
         
-        # Check if all drones are inactive (game over).
-        active_drones = [drone for drone in self.drones if drone.active]
+        # # Check if all drones are inactive (game over).
+        # active_drones = [drone for drone in self.drones if drone.active]
+        # done = False
+        # if len(active_drones < 1):
+        #     done = True
+        
+        # # Obtain next observation for the drone.
+        # # Observation is [type of observation, nearest position relative to drone (x,y)]
+        # # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection.
+        # observations = []
+        # for i, drone in enumerate(self.drones):
+        #     if drone.active:
+        #         scan_results = []
+        #         # Check for obstacles within scan.
+        #         for obstacle in self.obstacles:
+        #             d = self.distance(drone.x, drone.y, obstacle.x, obstacle.y)
+        #             if d < drone.scan_radius:
+        #                 delta_y = obstacle.y - drone.y
+        #                 delta_x = obstacle.x - drone.x
+        #                 scan_results.append([1, delta_x, delta_y])
+
+        #         # Check for other drones within scan.
+        #         for drone2 in self.drones:
+        #             d = self.distance(drone.x, drone.y, drone2.x, drone2.y)
+        #             if d < drone.scan_radius:
+        #                 delta_y = drone2.y - drone.y
+        #                 delta_x = drone2.x - drone.x
+        #                 scan_results.append([2, delta_x, delta_y])
+
+        #         # Check for targets within scan.
+        #         for target in self.targets:
+        #             d = self.distance(drone.x, drone.y, target.x, target.y)
+        #             if d < drone.scan_radius:
+        #                 delta_y = target.y - drone.y
+        #                 delta_x = target.x - drone.x
+        #                 scan_results.append([3, delta_x, delta_y])
+
+        #     scan_type = [0 for i in range(4)]
+        #     scan_coordinates = [[1000,1000] for i in range(8)]
+        #     for scan, j in enumerate(scan_results):
+        #         idx, delta_x, delta_y = scan
+        #         scan_type[idx] += 1
+        #         scan_coordinates[j] = [delta_x, delta_y]
+        #     drone_observation = scan_type + scan_coordinates
+        #     observations.append(drone_observation)
+
+        observations = [0,0]
+        rewards = 1
         done = False
-        if len(active_drones < 1):
-            done = True
-        
-        # Obtain next observation for the drone.
-        # Observation is [type of observation, nearest position relative to drone (x,y)]
-        # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection.
-        observations = []
-        for i, drone in enumerate(self.drones):
-            if drone.active:
-                scan_results = []
-                # Check for obstacles within scan.
-                for obstacle in self.obstacles:
-                    d = self.distance(drone.x, drone.y, obstacle.x, obstacle.y)
-                    if d < drone.scan_radius:
-                        delta_y = obstacle.y - drone.y
-                        delta_x = obstacle.x - drone.x
-                        scan_results.append([1, delta_x, delta_y])
-
-                # Check for other drones within scan.
-                for drone2 in self.drones:
-                    d = self.distance(drone.x, drone.y, drone2.x, drone2.y)
-                    if d < drone.scan_radius:
-                        delta_y = drone2.y - drone.y
-                        delta_x = drone2.x - drone.x
-                        scan_results.append([2, delta_x, delta_y])
-
-                # Check for targets within scan.
-                for target in self.targets:
-                    d = self.distance(drone.x, drone.y, target.x, target.y)
-                    if d < drone.scan_radius:
-                        delta_y = target.y - drone.y
-                        delta_x = target.x - drone.x
-                        scan_results.append([3, delta_x, delta_y])
-
-            scan_type = [0 for i in range(4)]
-            scan_coordinates = [[1000,1000] for i in range(8)]
-            for scan, j in enumerate(scan_results):
-                idx, delta_x, delta_y = scan
-                scan_type[idx] += 1
-                scan_coordinates[j] = [delta_x, delta_y]
-            drone_observation = scan_type + scan_coordinates
-            observations.append(drone_observation)
-
-
         
         return observations, rewards, done
-"""
+
 
     def reset(self):
         # reset environment and return the observation
