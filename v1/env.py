@@ -74,6 +74,7 @@ class Environment():
         return sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     def step(self, actions):
+        """
         # updates the enviroment given new control input (check for collisions)
         # return rewards, observations, completion for given action 
         # Update drone positions.
@@ -179,7 +180,7 @@ class Environment():
 
         
         return observations, rewards, done
-
+"""
 
     def reset(self):
         # reset environment and return the observation
