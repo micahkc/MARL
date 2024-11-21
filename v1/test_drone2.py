@@ -1,10 +1,11 @@
 from tkinter import Tk
+from random import randint
 # Import from other python modules.
 import gui
 from model import Agent
 def main():
     root = Tk()
-    env = gui.create_default_env()
+    env = gui.create_env()
     map = gui.Map(root,env)    
 
     # Actions are two components for each drone. These are angular acceleration and forward acceleration for this time step.
@@ -16,8 +17,14 @@ def main():
     while not done:
         # Get actions from each drone's actor policy and do these actions in the env.
         for i in range(env.num_drones):
-            actions[i][0]= 2-.01*c
-            actions[i][1] = 0
+            actions[0][0]= randint(-1,3)
+            actions[0][1] = randint(-1,1)
+
+            actions[1][0]= randint(-2,5)
+            actions[1][1] = randint(-5,5)
+            
+            actions[2][0]= randint(-5,10)
+            actions[2][1] = randint(-5,5)
         
         c=c+1
         next_observation, rewards, done = env.step(actions)

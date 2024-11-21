@@ -278,18 +278,17 @@ def create_default_env():
     global env, env_label, target_count_label, obstacle_count_label, drone_count_label, length_entry, width_entry
     global root, target_count_label, obstacle_count_label, drone_count_label
 
-
     # root = Tk()
 
     # create a default environment
     env = Environment(1000, 1000)
 
-    drone_params = [[250, 250], [250, 500], [250, 750]]
+    drone_params = [[250, 300], [250, 500], [250, 750]]
     for param in drone_params:
         env.add_drone(param[0], param[1])
 
 
-    obstacle_params = [[500, 250, 50], [500, 500, 50], [500, 750, 50]]
+    obstacle_params = [[500, 250, 30], [500, 500, 30], [500, 750, 30]]
     for param in obstacle_params:
         env.add_obstacle(param[0], param[1], param[2])
 

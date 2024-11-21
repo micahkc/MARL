@@ -95,46 +95,48 @@ class Environment():
             x = 0.5*a_x*(self.ctrl_rate**2) + v_x*self.ctrl_rate + prev_x
             y = 0.5*a_y*(self.ctrl_rate**2) + v_y*self.ctrl_rate + prev_y
 
-            # Save parameters to drone.
-            self.drones[i].x = x
-            self.drones[i].y = y
-            self.drones[i].v_x = x
-            self.drones[i].v_y = y
+            # Save parameters to drone if active.
+            if self.drones[i].active:
+                self.drones[i].x = x
+                self.drones[i].y = y
+                self.drones[i].v_x = v_x
+                self.drones[i].v_y = v_y
 
-        # # Check for collisions now that drones are in new positions.
-        # drones_to_remove = set()
-        # rewards = [0 for 0 in len(self.drones)]
-        # for i, drone in enumerate(self.drones):
-        #     if drone.active:
-        #         # Check for drone going off screen.
-        #         if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
-        #             drones_to_remove.add(i)
+        # Check for collisions now that drones are in new positions.
+        drones_to_remove = set()
+        rewards = [0 for x in range(self.num_drones)]
+        for i, drone in enumerate(self.drones):
+            if drone.active:
+                # Check for drone going off screen.
+                if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
+                    drones_to_remove.add(i)
 
-        #         # Check for obstacle collision.
-        #         elif self.check_obstacle_collision(drone.x, drone.y, drone.radius):
-        #             drones_to_remove.add(i)
+                # Check for obstacle collision.
+                elif self.check_obstacle_collision(drone.x, drone.y, drone.r):
+                    drones_to_remove.add(i)
                 
-        #         # Check for drone-drone collision.
-        #         # Compare with other drones, not itself.
-        #         elif self.check_drone_collision(drone.x, drone.y, drone.radius, drone.id):
-        #             drones_to_remove.add(i)
+                # Check for drone-drone collision.
+                # Compare with other drones, not itself.
+                elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
+                    drones_to_remove.add(i)
 
-        #         # Check for target acheivement.
-        #         else:
-        #             for target in self.targets:
-        #                 if self.distance(drone.x, drone.y, target.x, target.y) < (drone.radius + target.r):
-        #                     rewards[i] += 1
-        #                     self.targets.remove(target)
+                # Check for target acheivement.
+                else:
+                    for target in self.targets:
+                        if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
+                            print("Mission Accomplished")
+                            rewards[i] += 1
+                            self.targets.remove(target)
 
-        # # Remove collided drones.
-        # for i in drones_to_remove:
-        #     self.drones[i].active = False
+        # Remove collided drones.
+        for i in drones_to_remove:
+            self.drones[i].active = False
         
-        # # Check if all drones are inactive (game over).
-        # active_drones = [drone for drone in self.drones if drone.active]
-        # done = False
-        # if len(active_drones < 1):
-        #     done = True
+        # Check if all drones are inactive (game over).
+        active_drones = [drone for drone in self.drones if drone.active]
+        done = False
+        if len(active_drones) < 1:
+            done = True
         
         # # Obtain next observation for the drone.
         # # Observation is [type of observation, nearest position relative to drone (x,y)]

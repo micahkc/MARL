@@ -14,8 +14,7 @@ def main():
 
     # For each drone in the environment, create a learning agent.
     agents = []
-    num_drones = len(env.drones)
-    for i in range(num_drones):
+    for i in range(env.num_drones):
         agents.append(Agent(i))
 
     # Train.
@@ -24,7 +23,7 @@ def main():
         # Observation is [type of observation, position relative to drone (x,y)]
         # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection, 4: multiple detection
         observation = env.reset()
-        # Actions are two components for each drone. These are angular acceleration and forward acceleration for this time step.
+        # Actions are two components for each drone. These are x acceleration and y acceleration.
         actions = [0 for x in range(num_drones)]
         # This is used for difference between actor and critic models.
         errors = [0 for x in range(num_drones)]
