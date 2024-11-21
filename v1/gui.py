@@ -198,6 +198,57 @@ def draw_map():
         y = drone.y *scale
         map_canvas.create_rectangle(x-r, y-r, x+r, y+r, outline = "black", fill = BLACK, width = 2)
 
+def create_default_env():
+    global env
+
+    # create a default environment
+    env = Environment(1000, 1000)
+
+    drone_params = [[250, 250], [250, 500], [250, 750]]
+    for param in drone_params:
+        env.add_drone(param[0], param[1])
+
+
+    obstacle_params = [[500, 250, 50], [500, 500, 50], [500, 750, 50]]
+    for param in obstacle_params:
+        env.add_obstacle(param[0], param[1], param[2])
+
+    target_params = [[750, 250, 50, 2], [750, 500, 50, 2], [750, 750, 50, 2]]
+    for param in target_params:
+        env.add_target(param[0], param[1], param[2], param[3])
+
+    return env
+
+def create_random_env():
+    global env
+    
+    # create an enviroment
+    env = Environment(1000, 1000)
+    
+    num_drones = rand.randint(1,10)
+    num_obstacles = rand.randint(1,10)
+    nunm_targets = rand.randint(1,10)
+
+    for j in range(num_drones):
+        x = rand.randint(0,env.width)
+        y = rand.randint(0,env.length) 
+        env.add_drone(x,y)
+    
+    for j in range(num_obstacles):
+        x = rand.randint(0,env.width)
+        y = rand.randint(0,env.length)
+        r = rand.randint(1,50)
+        env.add_obstacle(x,y,r)
+
+    for j in range(nunm_targets):
+        x = rand.randint(0,env.width)
+        y = rand.randint(0,env.length)
+        r = rand.randint(1,50)
+        num_agents = rand.randint(1,5)
+        env.add_target(x,y,r,num_agents)
+
+    return env
+
     
 #-------------------- END OF BUTTON FUNCTIONS -----------------------------------------------------------------------#
 ######################################################################################################################
@@ -268,84 +319,25 @@ def create_env():
     draw_map_button = Button(text="Draw Map", command=draw_map)
     draw_map_button.place(x=200,y=180)
 
+    # create default environment button
+    default_env_button = Button(text="Create Default Setup", command=create_default_env)
+    default_env_button.place(x=0,y=220)
+
+    # create random environment set up 
+    random_env_button = Button(text="Create Random Setup", command=create_random_env)
+    random_env_button.place(x=0,y=250)
+
 
     root.mainloop()
 
     return env
 
 
-def create_default_env():
-    global env, env_label, target_count_label, obstacle_count_label, drone_count_label, length_entry, width_entry
-    global root, target_count_label, obstacle_count_label, drone_count_label
-
-    # root = Tk()
-
-    # create a default environment
-    env = Environment(1000, 1000)
-
-    drone_params = [[250, 300], [250, 500], [250, 750]]
-    for param in drone_params:
-        env.add_drone(param[0], param[1])
-
-
-    obstacle_params = [[500, 250, 30], [500, 500, 30], [500, 750, 30]]
-    for param in obstacle_params:
-        env.add_obstacle(param[0], param[1], param[2])
-
-    target_params = [[750, 250, 50, 2], [750, 500, 50, 2], [750, 750, 50, 2]]
-    for param in target_params:
-        env.add_target(param[0], param[1], param[2], param[3])
-
-    # draw_map()
-    # root.mainloop()
-
-    return env
-
-# def update_map(env, map_win):
-#     # create map window
-#     map_win.title(f"Map {env.width}x{env.length}")
-#     win_size = 800
-
-#     # scale the map acutal length to window size
-#     map_size = max([env.length, env.width])
-#     scale = win_size/map_size
-#     scaled_length = env.length*scale
-#     scaled_width = env.width*scale
-#     win_length = int(round(scaled_length))
-#     win_width = int(round(scaled_width))
-#     map_win.minsize(width=win_width, height=win_length)
-
-#     # create canvas for the map
-#     map_canvas = Canvas(map_win, width=win_width, height=win_length, bg=BEIGE)
-#     map_canvas.pack()
-    
-#     # add targets to the map
-#     for target in env.targets:
-#         x = target.x *scale
-#         y = target.y *scale
-#         r = target.r *scale
-#         map_canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = RED, width = 2)
-
-#     # add all obstacles to the map
-#     for obs in env.obstacles:
-#         x = obs.x *scale
-#         y = obs.y *scale
-#         r = obs.r *scale
-#         map_canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = NAVY, width = 2)
-
-#     # add all drones to the map
-#     for drone in env.drones:
-#         r = 7 # square half width
-#         x = drone.x *scale
-#         y = drone.y *scale
-#         map_canvas.create_rectangle(x-r, y-r, x+r, y+r, outline = "black", fill = BLACK, width = 2)
-
-
 
 class Map:
     def __init__(self, root, env):
         self.root = root
-        self.root.title("Map Animation")
+        self.root.title("Map")
 
         # scale the map acutal length to window size
         win_size = 800
@@ -405,11 +397,12 @@ class Map:
     
 
 if __name__ == "__main__":
+    env = create_env()
     root = Tk()
-    env = create_default_env()
+    # env = create_default_env()
     map = Map(root,env)
 
-    for j in range(1000):
+    while True:
         for drone in env.drones:
             drone.x = drone.x + rand.randint(-10,10)
             drone.y = drone.y + rand.randint(-10,10)
