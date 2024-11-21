@@ -1,36 +1,31 @@
+from tkinter import Tk
 # Import from other python modules.
 import gui
 from model import Agent
 def main():
-    # Set learning parameters.
-    num_epochs = 100
-    gamma = 0.8 # Discount factor.
-
-    # Create Environment including obstacles, targets, and drones, using GUI.
-    # env = gui.create_env()
+    root = Tk()
     env = gui.create_default_env()
-    print("Environment Created")
-
-    # For each drone in the environment, create a learning agent.
-    agents = []
-    num_drones = len(env.drones)
-    for i in range(num_drones):
-        agents.append(Agent(i))
+    map = gui.Map(root,env)    
 
     # Actions are two components for each drone. These are angular acceleration and forward acceleration for this time step.
-    actions = [0 for x in range(num_drones)]
-
+    actions = [[0,0] for x in range(env.num_drones)]
+    print(env.num_drones)
+    done = False
+    sum_rewards = 0
+    c=0
     while not done:
         # Get actions from each drone's actor policy and do these actions in the env.
-        for i in range(num_drones):
-            actions[i] = [1, 1]
+        for i in range(env.num_drones):
+            actions[i][0]= 0.001-.001*c
+            actions[i][1] = -0.001+.001*c
 
+        c=c+1
         next_observation, rewards, done = env.step(actions)
+        map.update_map(env)
         
         sum_rewards += rewards
-        
-
-        observation = next_observation
+    
+    root.mainloop()
         
 if __name__ == '__main__':
     main()
