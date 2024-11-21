@@ -1,7 +1,6 @@
    
 def main():
     # Create input gui for info about drones and environment.
-
     drones = []
     num_drones = 4
     num_epochs = 100

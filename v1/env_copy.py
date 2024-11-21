@@ -19,6 +19,7 @@ class Target():
 class Drone():
     
     def __init__(self, x, y):
+        # Global coordinate system.
         self.x = x
         self.y = y
         # Local coordinate system.

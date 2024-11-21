@@ -29,7 +29,7 @@ def main():
         while not done:
             # Get actions from each drone's actor policy and do these actions in the env.
             for i in range(num_drones):
-                actions[i] = drones[i].actor.forward(observation[i])
+                actions[i] = agents[i].actor.forward(observation[i])
 
             next_observation, rewards, done = env.step(actions)
             
