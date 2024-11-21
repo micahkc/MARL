@@ -1,5 +1,6 @@
 
 from math import sin, cos
+import math
 
 class Obstacle():
 
@@ -79,6 +80,7 @@ class Environment():
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     def step(self, actions):
+        """
         # updates the enviroment given new control input (check for collisions)
         # return rewards, observations, completion for given action 
 
@@ -154,6 +156,7 @@ class Environment():
         # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection.
         
         return next_observation, rewards, done
+        """
 
     def reset(self):
         # reset environment and return the observation

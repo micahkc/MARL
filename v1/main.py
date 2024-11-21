@@ -9,6 +9,7 @@ def main():
     # env = gui.create_env()
     env = gui.create_default_env()
     print("Environment Created")
+    gui.draw_env(env)
 
     # For each drone in the environment, create a learning agent.
     agents = []

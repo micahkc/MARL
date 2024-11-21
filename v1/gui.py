@@ -1,5 +1,7 @@
 from tkinter import *
 from env import Environment
+import time
+import random as rand
 # from project_Micah_update_10-11 import *
 
 #--------------------Colours------------------------
@@ -277,7 +279,7 @@ def create_default_env():
     global root, target_count_label, obstacle_count_label, drone_count_label
 
 
-    root = Tk()
+    # root = Tk()
 
     # create a default environment
     env = Environment(1000, 1000)
@@ -295,11 +297,124 @@ def create_default_env():
     for param in target_params:
         env.add_target(param[0], param[1], param[2], param[3])
 
-    draw_map()
-    root.mainloop()
+    # draw_map()
+    # root.mainloop()
 
     return env
 
+# def update_map(env, map_win):
+#     # create map window
+#     map_win.title(f"Map {env.width}x{env.length}")
+#     win_size = 800
+
+#     # scale the map acutal length to window size
+#     map_size = max([env.length, env.width])
+#     scale = win_size/map_size
+#     scaled_length = env.length*scale
+#     scaled_width = env.width*scale
+#     win_length = int(round(scaled_length))
+#     win_width = int(round(scaled_width))
+#     map_win.minsize(width=win_width, height=win_length)
+
+#     # create canvas for the map
+#     map_canvas = Canvas(map_win, width=win_width, height=win_length, bg=BEIGE)
+#     map_canvas.pack()
+    
+#     # add targets to the map
+#     for target in env.targets:
+#         x = target.x *scale
+#         y = target.y *scale
+#         r = target.r *scale
+#         map_canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = RED, width = 2)
+
+#     # add all obstacles to the map
+#     for obs in env.obstacles:
+#         x = obs.x *scale
+#         y = obs.y *scale
+#         r = obs.r *scale
+#         map_canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = NAVY, width = 2)
+
+#     # add all drones to the map
+#     for drone in env.drones:
+#         r = 7 # square half width
+#         x = drone.x *scale
+#         y = drone.y *scale
+#         map_canvas.create_rectangle(x-r, y-r, x+r, y+r, outline = "black", fill = BLACK, width = 2)
 
 
+
+class Map:
+    def __init__(self, root, env):
+        self.root = root
+        self.root.title("Map Animation")
+
+        # scale the map acutal length to window size
+        win_size = 800
+        map_size = max([env.length, env.width])
+        self.scale = win_size/map_size
+        scaled_length = env.length*self.scale
+        scaled_width = env.width*self.scale
+        win_length = int(round(scaled_length))
+        win_width = int(round(scaled_width))
+        root.minsize(width=win_width, height=win_length)
+
+        # create canvas for the map
+        self.canvas = Canvas(root, width=win_width, height=win_length, bg=BEIGE)
+        self.canvas.pack()
+
+        self.targets = []
+        for target in env.targets:
+            x = target.x *self.scale
+            y = target.y *self.scale
+            r = target.r *self.scale
+            oval = self.canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = RED, width = 2)
+            self.targets.append(oval)
+
+        self.obstacles = []
+        # add all obstacles to the map
+        for obs in env.obstacles:
+            x = obs.x *self.scale
+            y = obs.y *self.scale
+            r = obs.r *self.scale
+            oval = self.canvas.create_oval(x-r, y-r, x+r, y+r, outline = "black", fill = NAVY, width = 2)
+            self.obstacles.append(oval)
+        
+        self.drones = []
+        # add all drones to the map
+        for drone in env.drones:
+            r = 7 # square half width
+            x = drone.x *self.scale
+            y = drone.y *self.scale
+            rectangle = self.canvas.create_rectangle(x-r, y-r, x+r, y+r, outline = "black", fill = BLACK, width = 2)
+            self.drones.append(rectangle)
+
+
+    def update_map(self, env):
+        # Update the positions of the objects
+        for rect in self.drones:
+            self.canvas.delete(rect)
+        self.drones = []
+        for drone in env.drones:
+            r = 7 # square half width
+            x = drone.x *self.scale
+            y = drone.y *self.scale
+            rectangle = self.canvas.create_rectangle(x-r, y-r, x+r, y+r, outline = "black", fill = BLACK, width = 2)
+            self.drones.append(rectangle)
+
+        self.root.after(100)
+        self.canvas.update()
+    
+
+if __name__ == "__main__":
+    root = Tk()
+    env = create_default_env()
+    map = Map(root,env)
+
+    for j in range(1000):
+        for drone in env.drones:
+            drone.x = drone.x + rand.randint(-10,10)
+            drone.y = drone.y + rand.randint(-10,10)
+        map.update_map(env)
+
+    root.mainloop()
 
