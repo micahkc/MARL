@@ -4,6 +4,7 @@ from model import Agent
 def main():
     # Set learning parameters.
     num_epochs = 100
+    gamma = 0.8 # Discount factor.
 
     # Create Environment including obstacles, targets, and drones, using GUI.
     # env = gui.create_env()
@@ -37,14 +38,14 @@ def main():
             
             # Update critic network (Value function).
             for i in range(num_drones):
-                next_value = drones[i].critic.forward(next_observation[i])
+                next_value = agents[i].critic.forward(next_observation[i])
                 target = rewards[i] + gamma*next_value
-                errors[i] = target - drones[i].critic.forward(observation)
-                drones[i].critic.update(observation, target)
+                errors[i] = target - agents[i].critic.forward(observation)
+                agents[i].critic.update(observation, target)
 
             # Update actor network
             for i in range(num_drones):
-                drones[i].actor.update(observation, errors[i], actions[i])
+                agents[i].actor.update(observation, errors[i], actions[i])
 
             observation = next_observation
         
