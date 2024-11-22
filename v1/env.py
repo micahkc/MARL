@@ -137,7 +137,7 @@ class Environment():
         done = False
         if len(active_drones) < 1:
             done = True
-        
+            
         # # Obtain next observation for the drone.
         # # Observation is [type of observation, nearest position relative to drone (x,y)]
         # # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection.
@@ -180,7 +180,6 @@ class Environment():
 
         observations = [0,0]
         rewards = 1
-        done = False
         
         return observations, rewards, done
 
