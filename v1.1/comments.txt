@@ -1,0 +1,12 @@
+GUI:
+Drones square -> circle
+Color change for active/inactive target and drones
+Scan radius around drone with color change based on detection
+
+Env:
+Fix targets -> how many required to complete
+Make sure observations work
+Fix edge of environment behavior
+
+Model:
+Adjust neural nets
