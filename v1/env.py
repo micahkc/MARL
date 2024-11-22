@@ -15,6 +15,7 @@ class Target():
         self.y = y
         self.r = r
         self.num_agents = num_agents
+        self.active = True
 
 class Drone():
     
