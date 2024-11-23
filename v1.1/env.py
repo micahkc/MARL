@@ -26,9 +26,37 @@ class Drone():
         self.v_x = 0
         self.v_y = 0
         # Radius fo drone.
-        self.r = 20
-        self.scan_radius = 50
+        self.r = 10
+        self.scan_radius = 150
         self.active = True
+
+    def distance(self, obj):
+        return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
+
+    def get_observation(self, env):
+
+        # check for in view obstacles
+        in_view_obstacles = []
+        for obstacle in env.obstacles:
+            if self.distance(obstacle) < (self.scan_radius+obstacle.r):
+                in_view_obstacles.append(obstacle)
+
+        # check for in view drones
+        in_view_drones = []
+        for drone in env.drones:
+            if self.id != drone.id:
+                if drone.active:
+                    if self.distance(drone) < (self.scan_radius+drone.r):
+                        in_view_drones.append(drone)
+
+        # check for in view targets
+        in_view_targets = []
+        for target in env.targets:
+            if target.active:
+                if self.distance(target) < (self.scan_radius+target.r):
+                    in_view_targets.append(target)
+        
+        return (in_view_drones, in_view_targets, in_view_obstacles)
         
 class Environment():
 
@@ -124,10 +152,12 @@ class Environment():
                 # Check for target acheivement.
                 else:
                     for target in self.targets:
-                        if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
-                            print("Mission Accomplished")
-                            rewards[i] += 1
-                            self.targets.remove(target)
+                        if target.active:
+                            if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
+                                print("Mission Accomplished")
+                                target.active = False
+                                rewards[i] += 1
+                                # self.targets.remove(target)
 
         # Remove collided drones.
         for i in drones_to_remove:
