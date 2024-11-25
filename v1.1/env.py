@@ -206,16 +206,6 @@ class Environment():
                 elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
                     drones_to_remove.add(i)
 
-                # Check for target acheivement.
-                else:
-                    continue
-                    for target in self.targets:
-                        if target.active:
-                            if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
-                                print("Mission Accomplished")
-                                target.active = False
-                                rewards[drone.id] += 1
-                                # self.targets.remove(target)
 
         # loop through each target to check if target is accomplished
         for target in self.targets:
