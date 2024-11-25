@@ -4,9 +4,10 @@ Color change for active/inactive target and drones
 Scan radius around drone with color change based on detection
 
 Env:
-Fix targets -> how many required to complete
+Fix targets -> how many required to complete, then make target inactive.
+Fix edge of environment behavior -> Everytime it steps out of the environment, give it a small negative reward.
 Make sure observations work
-Fix edge of environment behavior
+
 
 Model:
 Adjust neural nets
