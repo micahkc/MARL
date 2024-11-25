@@ -1,11 +1,12 @@
 from tkinter import Tk
 from random import randint
+import torch
 # Import from other python modules.
 import gui
 from model import Agent
 def main():
     # Set learning parameters.
-    num_epochs = 100
+    num_epochs = 10000
     gamma = 0.8 # Discount factor.
 
     env = gui.create_default_env2()
@@ -20,6 +21,7 @@ def main():
     agents = []
     for i in range(env.num_drones):
         agents.append(Agent(i))
+        agents[i].create_models()
 
     # Actions are two components for each drone. These are angular acceleration and forward acceleration for this time step.
     actions = [[0,0] for x in range(env.num_drones)]
@@ -32,20 +34,22 @@ def main():
         c=0
 
         observations = env.reset()
-        print(f"initial observation: {observations}")
+        
         while not done:
+        #    # Get actions from each drone's actor policy and do these actions in the env.
+        #     for i in range(env.num_drones):
+        #         actions[i][0]= randint(-1,1)
+        #         actions[i][1] = randint(-1,1)
+
             # Get actions from each drone's actor policy and do these actions in the env.
             for i in range(env.num_drones):
-                actions[i][0]= randint(-1,1)
-                actions[i][1] = randint(-1,1)
-
-            # #Get actions from each drone's actor policy and do these actions in the env.
-            # for i in range(num_drones):
-            #     actions[i] = agents[i].actor.forward(observation[i])
+                observation = torch.tensor(observations[i+1]).float()
+                observation = observation.flatten()
+                actions[i] = agents[i].actor.forward(observation)
             
             next_observation, rewards, done = env.step(actions)
-            print(rewards)
-            print(next_observation)
+            sum_rewards += rewards[1]
+            print(sum_rewards)
 
             if map.visual:
                 map.update_map(env)
