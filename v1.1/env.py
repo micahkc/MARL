@@ -196,7 +196,7 @@ class Environment():
                 # Check for drone going off screen.
                 if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
                     drones_to_remove.add(i)
-
+                                 
                 # Check for obstacle collision.
                 elif self.check_obstacle_collision(drone.x, drone.y, drone.r):
                     drones_to_remove.add(i)
@@ -216,7 +216,24 @@ class Environment():
                                 target.active = False
                                 rewards[drone.id] += 1
                                 # self.targets.remove(target)
-
+                                
+                # Add negative reward based on proximity to the edge.
+                proximity_x = 0
+                proximity_y = 0
+                proximity = 0
+                if drone.x < 0 or drone.x > self.width:
+                    proximity_x = min(abs(drone.x), abs(self.width - drone.x))
+                    if proximity_x > 100:
+                        self.drone[i].active = False
+                    
+                if drone.y < 0 or drone.y > self.length:
+                    proximity_y = min(abs(drone.y), abs(self.length - drone.y))
+                    if proximity_y > 100:
+                        self.drone[i].active = False
+                                   
+                proximity += proximity_x + proximity_y
+                rewards[i] -= (proximity) * 0.1
+                
         # loop through each target to check if target is accomplished
         for target in self.targets:
             if target.active:
