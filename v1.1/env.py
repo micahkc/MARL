@@ -17,6 +17,29 @@ class Target():
         self.num_agents = num_agents
         self.active = True
 
+    def distance(self, obj):
+        return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
+
+    def check_target_success(self,env):
+        # counter for number of drones on target
+        num_drones_on_target = 0
+        drones_on_target = []
+
+        # check if each drone is on the target or not
+        # only consider active drones
+        for drone in env.drones:
+            if drone.active:
+                if self.distance(drone) < self.r + drone.r:
+                    num_drones_on_target += 1
+                    drones_on_target.append(drone)
+        
+        # if the number of drones on target matches or exceeds the required number,
+        # then return true.
+        if num_drones_on_target >= self.num_agents:
+            return True, drones_on_target
+        else:
+            return False, drones_on_target
+
 class Drone():
     
     def __init__(self, x, y, id):
@@ -25,7 +48,7 @@ class Drone():
         self.id = id
         self.v_x = 0
         self.v_y = 0
-        # Radius fo drone.
+        # Radius for drone.
         self.r = 10
         self.scan_radius = 150
         self.active = True
@@ -101,6 +124,38 @@ class Environment():
 
     def distance(self, x1, y1, x2, y2):
         return sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    
+    def get_observations(self):
+        # Observation is in format [drone coordinates, drone velocity, coordinates of drones in view, coordinates of obstacles in view, coordinates of targets in view]
+        observations = {}
+        for i,drone in enumerate(self.drones):
+            drone_coord = []
+            drone_vel = []
+            nearby_drones = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            nearby_obstacles = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            nearby_targets = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            # Obtain drone coordinates.
+            drone_coord.append([drone.x, drone.y])
+            drone_vel.append([drone.v_x, drone.v_y])
+
+            in_view_drones, in_view_targets, in_view_obstacles = drone.get_observation(self)
+            
+            for j,d in enumerate(in_view_drones):
+                print("Drone detected")
+                nearby_drones[j] = [d.x, d.y]
+
+            for j,o in enumerate(in_view_obstacles):
+                print("obstacle detected")
+                nearby_obstacles[j] = [o.x, o.y]
+
+            for j,t in enumerate(in_view_targets):
+                print("target detected")
+                print([t.x, t.y])
+                nearby_targets[j] = [t.x, t.y]
+
+            obs = [drone_coord, drone_vel, nearby_drones, nearby_obstacles, nearby_targets]
+            observations[drone.id] = obs
+        return observations
 
     def step(self, actions):
         # updates the enviroment given new control input (check for collisions)
@@ -130,10 +185,12 @@ class Environment():
                 self.drones[i].y = y
                 self.drones[i].v_x = v_x
                 self.drones[i].v_y = v_y
+        # Negative reward for going off screen
 
         # Check for collisions now that drones are in new positions.
         drones_to_remove = set()
-        rewards = [0 for x in range(self.num_drones)]
+        # rewards = [0 for x in range(self.num_drones)]
+        rewards = {drone.id:0 for drone in self.drones}
         for i, drone in enumerate(self.drones):
             if drone.active:
                 # Check for drone going off screen.
@@ -151,12 +208,13 @@ class Environment():
 
                 # Check for target acheivement.
                 else:
+                    continue
                     for target in self.targets:
                         if target.active:
                             if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
                                 print("Mission Accomplished")
                                 target.active = False
-                                rewards[i] += 1
+                                rewards[drone.id] += 1
                                 # self.targets.remove(target)
                                 
                 # Add negative reward based on proximity to the edge.
@@ -176,6 +234,18 @@ class Environment():
                 proximity += proximity_x + proximity_y
                 rewards[i] -= (proximity) * 0.1
                 
+        # loop through each target to check if target is accomplished
+        for target in self.targets:
+            if target.active:
+                target_success, drones_on_target = target.check_target_success(self)
+                if target_success:
+                    print("Mission Accomplished")
+                    target.active = False
+                    for drone in drones_on_target:
+                        rewards[drone.id] += 1
+                        # give the drone a reward
+                        continue
+
         # Remove collided drones.
         for i in drones_to_remove:
             self.drones[i].active = False
@@ -186,48 +256,9 @@ class Environment():
         if len(active_drones) < 1:
             done = True
             
-        # # Obtain next observation for the drone.
-        # # Observation is [type of observation, nearest position relative to drone (x,y)]
-        # # Options for type of observation are 0: no detection, 1: target detection, 2: obstacle detection, 3: drone detection.
-        # observations = []
-        # for i, drone in enumerate(self.drones):
-        #     if drone.active:
-        #         scan_results = []
-        #         # Check for obstacles within scan.
-        #         for obstacle in self.obstacles:
-        #             d = self.distance(drone.x, drone.y, obstacle.x, obstacle.y)
-        #             if d < drone.scan_radius:
-        #                 delta_y = obstacle.y - drone.y
-        #                 delta_x = obstacle.x - drone.x
-        #                 scan_results.append([1, delta_x, delta_y])
-
-        #         # Check for other drones within scan.
-        #         for drone2 in self.drones:
-        #             d = self.distance(drone.x, drone.y, drone2.x, drone2.y)
-        #             if d < drone.scan_radius:
-        #                 delta_y = drone2.y - drone.y
-        #                 delta_x = drone2.x - drone.x
-        #                 scan_results.append([2, delta_x, delta_y])
-
-        #         # Check for targets within scan.
-        #         for target in self.targets:
-        #             d = self.distance(drone.x, drone.y, target.x, target.y)
-        #             if d < drone.scan_radius:
-        #                 delta_y = target.y - drone.y
-        #                 delta_x = target.x - drone.x
-        #                 scan_results.append([3, delta_x, delta_y])
-
-        #     scan_type = [0 for i in range(4)]
-        #     scan_coordinates = [[1000,1000] for i in range(8)]
-        #     for scan, j in enumerate(scan_results):
-        #         idx, delta_x, delta_y = scan
-        #         scan_type[idx] += 1
-        #         scan_coordinates[j] = [delta_x, delta_y]
-        #     drone_observation = scan_type + scan_coordinates
-        #     observations.append(drone_observation)
-
-        observations = [0,0]
-        rewards = 1
+        # Obtain next observation for the drone.
+        # Observation is [drone position, drone speed, type of observation, nearest position relative to drone (x,y)]
+        observations = self.get_observations()
         
         return observations, rewards, done
 
