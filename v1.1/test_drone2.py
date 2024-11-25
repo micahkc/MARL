@@ -22,9 +22,10 @@ def main():
         
         c=c+1
         next_observation, rewards, done = env.step(actions)
+        print(next_observation[1])
         map.update_map(env)
         
-        sum_rewards += rewards
+        # sum_rewards += rewards
     print("done")
     root.mainloop()
         
