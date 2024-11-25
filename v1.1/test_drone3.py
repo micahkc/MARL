@@ -12,7 +12,7 @@ def main():
 
     root = Tk()
     map = gui.Map(root,env)
-    map.visual = False
+    map.visual = True
     if not map.visual:
         root.destroy()
 

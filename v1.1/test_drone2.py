@@ -8,7 +8,7 @@ def main():
     env = gui.create_env()
     root = Tk()
     map = gui.Map(root,env)
-    map.visual = False
+    map.visual = True
     if map.visual == False:
         root.destroy()    
 
