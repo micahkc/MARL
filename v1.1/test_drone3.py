@@ -12,6 +12,9 @@ def main():
 
     root = Tk()
     map = gui.Map(root,env)
+    map.visual = False
+    if not map.visual:
+        root.destroy()
 
     # For each drone in the environment, create a learning agent.
     agents = []
@@ -43,7 +46,9 @@ def main():
             next_observation, rewards, done = env.step(actions)
             print(rewards)
             print(next_observation)
-            map.update_map(env)
+
+            if map.visual:
+                map.update_map(env)
 
             # # Update critic network (Value function).
             # for i in range(num_drones):
