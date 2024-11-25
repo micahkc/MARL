@@ -137,32 +137,29 @@ class Environment():
         # Observation is in format [drone coordinates, drone velocity, coordinates of drones in view, coordinates of obstacles in view, coordinates of targets in view]
         observations = {}
         for i,drone in enumerate(self.drones):
-            drone_coord = []
-            drone_vel = []
-            nearby_drones = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
-            nearby_obstacles = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
-            nearby_targets = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
-            # Obtain drone coordinates.
-            drone_coord.append([drone.x, drone.y])
-            drone_vel.append([drone.v_x, drone.v_y])
+            nearby_drones = [[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            nearby_obstacles = [[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            nearby_targets = [[-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+            # Obtain drone coordinates and velocity.
+            drone_info = [[drone.x], [drone.y], [drone.v_x], [drone.v_y]]
 
+            # Find items from environment the drone can sense.
             in_view_drones, in_view_targets, in_view_obstacles = drone.get_observation(self)
             
             for j,d in enumerate(in_view_drones):
-                print("Drone detected")
                 nearby_drones[j] = [d.x, d.y]
 
             for j,o in enumerate(in_view_obstacles):
-                print("obstacle detected")
                 nearby_obstacles[j] = [o.x, o.y]
 
             for j,t in enumerate(in_view_targets):
-                print("target detected")
-                print([t.x, t.y])
                 nearby_targets[j] = [t.x, t.y]
 
-            obs = [drone_coord, drone_vel, nearby_drones, nearby_obstacles, nearby_targets]
-            observations[drone.id] = obs
+            obs = [drone_info, nearby_drones, nearby_obstacles, nearby_targets]
+            flat_observation = [x for xss in obs for xs in xss for x in xs]
+            observations[drone.id] = flat_observation
+
+            
         return observations
 
     def step(self, actions):

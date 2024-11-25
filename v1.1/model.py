@@ -5,13 +5,13 @@ import torch.nn.functional as F
 
 class Agent():
     def __init__(self, n):
-        self.id = f"drone {n}"
+        self.id = n
 
     class Actor(nn.Module):
-        def __init__(self, hidden_dim=16):
+        def __init__(self, hidden_dim=28):
             super().__init__()
 
-            self.hidden = nn.Linear(4, hidden_dim)
+            self.hidden = nn.Linear(28, hidden_dim)
             self.output = nn.Linear(hidden_dim, 2)
 
         def forward(self, s):
@@ -33,7 +33,7 @@ class Agent():
             value = self.output(outs)
             return value
     
-    def createModels(self):
+    def create_models(self):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.actor = self.Actor().to(device)
         self.critic = self.Critic().to(device)
@@ -41,12 +41,12 @@ class Agent():
         self.optimizerA = optim.Adam(self.actor.parameters())
         self.optimizerC = optim.Adam(self.critic.parameters())
 
-    def updateCritic(self, observation, target):
+    def update_critic(self, observation, target):
         self.optimizerC.zero_grad()
         self.critic_loss.backward()
         self.optimizerC.step()
 
-    def updateActor(self, observation, error, action):
+    def update_actor(self, observation, error, action):
         self.optimizerA.zero_grad()
         self.actor_loss.backward()
         self.optimizerA.step()
