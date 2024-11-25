@@ -4,7 +4,8 @@ from random import randint
 import gui
 from model import Agent
 def main():
-    env = gui.create_env()
+    # env = gui.create_env()
+    env = gui.create_default_env2()
     root = Tk()
     map = gui.Map(root,env)    
 
@@ -22,7 +23,7 @@ def main():
         
         c=c+1
         next_observation, rewards, done = env.step(actions)
-        print(next_observation[1])
+        print(rewards)
         map.update_map(env)
         
         # sum_rewards += rewards

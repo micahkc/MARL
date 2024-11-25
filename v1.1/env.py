@@ -16,6 +16,7 @@ class Target():
         self.r = r
         self.num_agents = num_agents
         self.active = True
+        self.reward = 10
 
     def distance(self, obj):
         return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
@@ -52,6 +53,9 @@ class Drone():
         self.r = 10
         self.scan_radius = 150
         self.active = True
+
+        self.x_0 = x
+        self.y_0 = y
 
     def distance(self, obj):
         return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
@@ -93,6 +97,8 @@ class Environment():
 
         # Use control input for this many seconds.
         self.ctrl_rate = 0.5 
+        self.reward_boundary = 0.1
+        self.max_boundary = 100
         
 
     def add_target(self,x,y,r,num_agents):
@@ -187,52 +193,40 @@ class Environment():
                 self.drones[i].v_y = v_y
         # Negative reward for going off screen
 
-        # Check for collisions now that drones are in new positions.
-        drones_to_remove = set()
-        # rewards = [0 for x in range(self.num_drones)]
+        # Create dictionary of rewards (reward for each drone)
         rewards = {drone.id:0 for drone in self.drones}
-        for i, drone in enumerate(self.drones):
-            if drone.active:
-                # Check for drone going off screen.
-                if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
-                    drones_to_remove.add(i)
-                                 
-                # Check for obstacle collision.
-                elif self.check_obstacle_collision(drone.x, drone.y, drone.r):
-                    drones_to_remove.add(i)
-                
-                # Check for drone-drone collision.
-                # Compare with other drones, not itself.
-                elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
-                    drones_to_remove.add(i)
 
-                # Check for target acheivement.
-                else:
-                    continue
-                    for target in self.targets:
-                        if target.active:
-                            if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
-                                print("Mission Accomplished")
-                                target.active = False
-                                rewards[drone.id] += 1
-                                # self.targets.remove(target)
+        # Check collisions, and boundaries.
+        for i, drone in enumerate(self.drones):
+            if drone.active:                                 
+                # Check for obstacle collision.
+                if self.check_obstacle_collision(drone.x, drone.y, drone.r):
+                    drone.active = False
+                    rewards[drone.id] -= 1
+                
+                # Check for drone-drone collision. Compare with other drones, not itself.
+                elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
+                    drone.active = False
+                    rewards[drone.id] -= 1
                                 
-                # Add negative reward based on proximity to the edge.
+                # Add negative reward if drone is outside of boundary (proportional to distance from edge).
+                # Deactivate the drone if too far outside.
                 proximity_x = 0
                 proximity_y = 0
                 proximity = 0
                 if drone.x < 0 or drone.x > self.width:
                     proximity_x = min(abs(drone.x), abs(self.width - drone.x))
-                    if proximity_x > 100:
-                        self.drone[i].active = False
+                    if proximity_x > self.max_boundary:
+                        drone.active = False
                     
                 if drone.y < 0 or drone.y > self.length:
                     proximity_y = min(abs(drone.y), abs(self.length - drone.y))
-                    if proximity_y > 100:
-                        self.drone[i].active = False
+                    if proximity_y > self.max_boundary:
+                        drone.active = False
                                    
                 proximity += proximity_x + proximity_y
-                rewards[i] -= (proximity) * 0.1
+                rewards[drone.id] = proximity * self.reward_boundary
+
                 
         # loop through each target to check if target is accomplished
         for target in self.targets:
@@ -242,13 +236,11 @@ class Environment():
                     print("Mission Accomplished")
                     target.active = False
                     for drone in drones_on_target:
-                        rewards[drone.id] += 1
+                        rewards[drone.id] += target.reward
                         # give the drone a reward
                         continue
 
-        # Remove collided drones.
-        for i in drones_to_remove:
-            self.drones[i].active = False
+        
         
         # Check if all drones are inactive (game over).
         active_drones = [drone for drone in self.drones if drone.active]
@@ -265,11 +257,20 @@ class Environment():
 
     def reset(self):
         # reset environment and return the observation
-        return
+        # Reset targets as active.
+        for target in self.targets:
+            target.active = True
+        # Obstacles don't change
+        # Drones reset position and velocity and set as active.
+        for drone in self.drones:
+            drone.active = True
+            drone.x = drone.x_0
+            drone.y = drone.y_0
+            drone.v_x = 0
+            drone.v_y = 0
 
-    def get_params():
-        # Returns all necessary parameters for visualization.
-        return
+        observations = self.get_observations()
+        return observations
         
     
 # Collision detection. Aniket! 

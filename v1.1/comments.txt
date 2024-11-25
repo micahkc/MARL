@@ -1,12 +1,10 @@
-GUI:
-Drones square -> circle
-Color change for active/inactive target and drones
-Scan radius around drone with color change based on detection
+Environment creation:
+obstacles don't overlap with each other or targets, or starting position of drones
+obstacles and targets do not go off edge of screen.
+Visual = False
 
-Env:
-Fix targets -> how many required to complete, then make target inactive.
-Fix edge of environment behavior -> Everytime it steps out of the environment, give it a small negative reward.
-Make sure observations work
+env:
+done = True when all targets acheived.
 
 
 Model:
