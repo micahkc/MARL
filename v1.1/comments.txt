@@ -1,10 +1,11 @@
 Environment creation:
-obstacles don't overlap with each other or targets, or starting position of drones
-obstacles and targets do not go off edge of screen.
-Visual = False
+obstacles don't overlap with each other or targets, or starting position of drones - complete
+obstacles and targets do not go off edge of screen. - complete for targets
+Visual = False - complete
 
 env:
-done = True when all targets acheived.
+done = True when all targets acheived. - complete
+drone crash only one drone becomes inactive (need to make both inactive) - complete
 
 
 Model:

@@ -3,6 +3,7 @@ from env import Environment
 import time
 import random as rand
 from colormap import rgb2hex
+from math import sqrt
 # from project_Micah_update_10-11 import *
 
 #--------------------Colours------------------------
@@ -252,27 +253,64 @@ def create_random_env():
     
     num_drones = rand.randint(1,10)
     num_obstacles = rand.randint(1,10)
-    nunm_targets = rand.randint(1,10)
+    num_targets = rand.randint(1,10)
 
-    for j in range(num_drones):
-        x = rand.randint(0,env.width)
-        y = rand.randint(0,env.length) 
-        env.add_drone(x,y)
-    
-    for j in range(num_obstacles):
-        x = rand.randint(0,env.width)
-        y = rand.randint(0,env.length)
-        r = rand.randint(1,50)
-        env.add_obstacle(x,y,r)
+    objects = []
 
-    for j in range(nunm_targets):
-        x = rand.randint(0,env.width)
-        y = rand.randint(0,env.length)
+    # randomly add targets
+    for j in range(num_targets):
         r = rand.randint(1,50)
-        r = 150
+        r = 100
         num_agents = rand.randint(1,5)
-        num_agents = 3
-        env.add_target(x,y,r,num_agents)   
+        num_agents = 1
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+r):
+                    overlap = True
+                    break
+
+            if (x+r>env.width) or (x-r<0) or (y+r>env.length) or (y-r<0):
+                overlap = True
+        
+            if not overlap:
+                env.add_target(x,y,r,num_agents)  
+                objects.append(env.targets[-1])
+
+    # randomly add obstacles
+    for j in range(num_obstacles):
+        r = rand.randint(1,50)
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+r):
+                    overlap = True
+                    break
+            if not overlap:
+                env.add_obstacle(x,y,r)
+                objects.append(env.obstacles[-1])
+
+    # randomly add drones
+    for j in range(num_drones):
+        
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+env.drone_radius):
+                    overlap = True
+                    break
+            if not overlap:
+                env.add_drone(x,y)
+                objects.append(env.drones[-1])
 
     return env
 
@@ -372,6 +410,7 @@ class Map:
     def __init__(self, root, env):
         self.root = root
         self.root.title("Map")
+        self.visual = True
 
         # retreive the computer screen dimensions
         screen_width = self.root.winfo_screenwidth()
@@ -460,7 +499,8 @@ class Map:
         for target in env.targets:
             if not target.active:
                 self.canvas.itemconfig(self.targets[target], fill = GREY)
-
+            else:
+                self.canvas.itemconfig(self.targets[target], fill = RED)
 
         self.root.after(50)
         self.canvas.update()

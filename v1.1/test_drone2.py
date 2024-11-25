@@ -5,9 +5,12 @@ import gui
 from model import Agent
 def main():
     # env = gui.create_env()
-    env = gui.create_default_env2()
+    env = gui.create_env()
     root = Tk()
-    map = gui.Map(root,env)    
+    map = gui.Map(root,env)
+    map.visual = False
+    if map.visual == False:
+        root.destroy()    
 
     # Actions are two components for each drone. These are angular acceleration and forward acceleration for this time step.
     actions = [[0,0] for x in range(env.num_drones)]
@@ -24,7 +27,8 @@ def main():
         c=c+1
         next_observation, rewards, done = env.step(actions)
         print(rewards)
-        map.update_map(env)
+        if map.visual:
+            map.update_map(env)
         
         # sum_rewards += rewards
     print("done")
