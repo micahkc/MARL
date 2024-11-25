@@ -4,7 +4,7 @@ from random import randint
 import gui
 from model import Agent
 def main():
-    env = gui.create_random_env()
+    env = gui.create_env()
     root = Tk()
     map = gui.Map(root,env)    
 

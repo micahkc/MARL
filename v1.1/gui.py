@@ -246,7 +246,9 @@ def create_random_env():
         x = rand.randint(0,env.width)
         y = rand.randint(0,env.length)
         r = rand.randint(1,50)
+        r = 150
         num_agents = rand.randint(1,5)
+        num_agents = 3
         env.add_target(x,y,r,num_agents)   
 
     return env
@@ -437,7 +439,7 @@ class Map:
                 self.canvas.itemconfig(self.targets[target], fill = GREY)
 
 
-        self.root.after(100)
+        self.root.after(50)
         self.canvas.update()
     
 if __name__ == "__main__":

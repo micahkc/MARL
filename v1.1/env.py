@@ -17,6 +17,29 @@ class Target():
         self.num_agents = num_agents
         self.active = True
 
+    def distance(self, obj):
+        return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
+
+    def check_target_success(self,env):
+        # counter for number of drones on target
+        num_drones_on_target = 0
+        drones_on_target = []
+
+        # check if each drone is on the target or not
+        # only consider active drones
+        for drone in env.drones:
+            if drone.active:
+                if self.distance(drone) < self.r + drone.r:
+                    num_drones_on_target += 1
+                    drones_on_target.append(drone)
+        
+        # if the number of drones on target matches or exceeds the required number,
+        # then return true.
+        if num_drones_on_target >= self.num_agents:
+            return True, drones_on_target
+        else:
+            return False, drones_on_target
+
 class Drone():
     
     def __init__(self, x, y, id):
@@ -25,7 +48,7 @@ class Drone():
         self.id = id
         self.v_x = 0
         self.v_y = 0
-        # Radius fo drone.
+        # Radius for drone.
         self.r = 10
         self.scan_radius = 150
         self.active = True
@@ -133,7 +156,8 @@ class Environment():
 
         # Check for collisions now that drones are in new positions.
         drones_to_remove = set()
-        rewards = [0 for x in range(self.num_drones)]
+        # rewards = [0 for x in range(self.num_drones)]
+        rewards = {drone.id:0 for drone in self.drones}
         for i, drone in enumerate(self.drones):
             if drone.active:
                 # Check for drone going off screen.
@@ -151,13 +175,26 @@ class Environment():
 
                 # Check for target acheivement.
                 else:
+                    continue
                     for target in self.targets:
                         if target.active:
                             if self.distance(drone.x, drone.y, target.x, target.y) < (drone.r + target.r):
                                 print("Mission Accomplished")
                                 target.active = False
-                                rewards[i] += 1
+                                rewards[drone.id] += 1
                                 # self.targets.remove(target)
+
+        # loop through each target to check if target is accomplished
+        for target in self.targets:
+            if target.active:
+                target_success, drones_on_target = target.check_target_success(self)
+                if target_success:
+                    print("Mission Accomplished")
+                    target.active = False
+                    for drone in drones_on_target:
+                        rewards[drone.id] += 1
+                        # give the drone a reward
+                        continue
 
         # Remove collided drones.
         for i in drones_to_remove:
