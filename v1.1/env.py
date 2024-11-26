@@ -190,7 +190,6 @@ class Environment():
                 self.drones[i].y = y
                 self.drones[i].v_x = v_x
                 self.drones[i].v_y = v_y
-        # Negative reward for going off screen
 
         # Create dictionary of rewards (reward for each drone)
         rewards = {drone.id:0 for drone in self.drones}
@@ -207,7 +206,7 @@ class Environment():
                 # Check for drone-drone collision. Compare with other drones, not itself.
                 elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 1
+                    rewards[drone.id] -= 10
                                 
                 # Add negative reward if drone is outside of boundary (proportional to distance from edge).
                 # Deactivate the drone if too far outside.
@@ -236,7 +235,7 @@ class Environment():
             if target.active:
                 target_success, drones_on_target = target.check_target_success(self)
                 if target_success:
-                    print("Mission Accomplished")
+                    #print("Mission Accomplished")
                     target.active = False
                     for drone in drones_on_target:
                         rewards[drone.id] += target.reward
