@@ -8,15 +8,21 @@ class Agent():
         self.id = n
 
     class Actor(nn.Module):
-        def __init__(self, hidden_dim=28):
+        def __init__(self):
             super().__init__()
 
-            self.hidden = nn.Linear(28, hidden_dim)
-            self.output = nn.Linear(hidden_dim, 2)
+            self.hidden1 = nn.Linear(28, 28)
+            self.hidden2 = nn.Linear(28, 16)
+            self.hidden3 = nn.Linear(16, 8)
+            self.output= nn.Linear(8,2)
 
         def forward(self, s):
-            outs = self.hidden(s)
-            outs = F.relu(outs)
+            outs = self.hidden1(s)
+            outs = F.tanh(outs)
+            outs = self.hidden2(outs)
+            outs = F.tanh(outs)
+            outs = self.hidden3(outs)
+            outs = F.tanh(outs)
             logits = self.output(outs)
             return logits
     
@@ -24,7 +30,7 @@ class Agent():
         def __init__(self, hidden_dim=16):
             super().__init__()
 
-            self.hidden = nn.Linear(4, hidden_dim)
+            self.hidden = nn.Linear(28, 28)
             self.output = nn.Linear(hidden_dim, 1)
 
         def forward(self, s):

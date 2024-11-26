@@ -13,7 +13,7 @@ def main():
 
     root = Tk()
     map = gui.Map(root,env)
-    map.visual = False
+    map.visual = True
     if not map.visual:
         root.destroy()
 
@@ -31,6 +31,7 @@ def main():
     for i in range(num_epochs):
         done = False
         sum_rewards = 0
+        rewards = {1:5.0}
         c=0
 
         observations = env.reset()
@@ -45,25 +46,29 @@ def main():
             for i in range(env.num_drones):
                 observation = torch.tensor(observations[i+1]).float()
                 observation = observation.flatten()
-                actions[i] = agents[i].actor.forward(observation)
+                current_action = agents[i].actor.forward(observation)
+                actions[i] = current_action.detach().numpy()
             
-            next_observation, rewards, done = env.step(actions)
-            print(rewards[1])
-            sum_rewards += rewards[1]
+            next_observations, rewards, done = env.step(actions)
 
             if map.visual:
                 map.update_map(env)
 
-            # # Update critic network (Value function).
-            # for i in range(num_drones):
-            #     next_value = agents[i].critic.forward(next_observation[i])
-            #     target = rewards[i] + gamma*next_value
-            #     errors[i] = target - agents[i].critic.forward(observation)
-            #     agents[i].critic.update(observation, target)
+            # Update critic network (Value function).
+            for i in range(env.num_drones):
+                next_observation = torch.tensor(next_observations[i+1]).float()
+                observation = torch.tensor(observations[i+1]).float()
+                next_observation = next_observation.flatten()
+                observation = observation.flatten()
 
-            # # Update actor network
-            # for i in range(num_drones):
-            #     agents[i].actor.update(observation, errors[i], actions[i])
+                next_value = agents[i].critic.forward(next_observation)
+                target = rewards[i] + gamma*next_value
+                errors[i] = target - agents[i].critic.forward(observation)
+                agents[i].critic.update(observation, target)
+
+            # Update actor network
+            for i in range(num_drones):
+                agents[i].actor.update(observation, errors[i], actions[i])
 
             observation = next_observation
             

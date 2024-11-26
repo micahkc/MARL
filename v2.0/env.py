@@ -45,6 +45,7 @@ class Drone():
     
     def __init__(self, x, y, id, radius):
         self.x = x
+        print(f"initial x: {x}, {self.x}")
         self.y = y
         self.id = id
         self.v_x = 0
@@ -99,7 +100,7 @@ class Environment():
 
         # Use control input for this many seconds.
         self.ctrl_rate = 0.5 
-        self.reward_boundary = 0.1
+        self.reward_boundary = -0.1
         self.max_boundary = 100
         
 
