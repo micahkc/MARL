@@ -6,14 +6,14 @@ import gui
 from model import Agent
 def main():
     # Set learning parameters.
-    num_epochs = 10000
+    num_epochs = 100
     gamma = 0.8 # Discount factor.
 
     env = gui.create_default_env2()
 
     root = Tk()
     map = gui.Map(root,env)
-    map.visual = True
+    map.visual = False
     if not map.visual:
         root.destroy()
 
@@ -48,8 +48,8 @@ def main():
                 actions[i] = agents[i].actor.forward(observation)
             
             next_observation, rewards, done = env.step(actions)
+            print(rewards[1])
             sum_rewards += rewards[1]
-            print(sum_rewards)
 
             if map.visual:
                 map.update_map(env)
@@ -69,7 +69,7 @@ def main():
             
             
             # sum_rewards += rewards
-        print("need to reset")
+        #print(sum_rewards)
     root.mainloop()
         
 if __name__ == '__main__':
