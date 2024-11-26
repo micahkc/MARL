@@ -21,8 +21,8 @@ def main():
     while not done:
         # Get actions from each drone's actor policy and do these actions in the env.
         for i in range(env.num_drones):
-            actions[i][0]= randint(-1,1)
-            actions[i][1] = randint(-1,1)
+            actions[i][0]= randint(-2,2)
+            actions[i][1] = randint(-2,2)
         
         c=c+1
         next_observation, rewards, done = env.step(actions)
