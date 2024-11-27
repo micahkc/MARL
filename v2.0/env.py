@@ -259,6 +259,7 @@ class Environment():
         # Observation is [drone position, drone speed, type of observation, nearest position relative to drone (x,y)]
         observations = self.get_observations()
         
+        print(rewards[1])
         return observations, rewards, done
 
 

@@ -45,10 +45,11 @@ def main():
             for i in range(env.num_drones):
                 observation = torch.tensor(observations[i+1]).float()
                 observation = observation.flatten()
-                actions[i] = agents[i].actor.forward(observation)
+                actions[i] = agents[i].act or.forward(observation)
             
             next_observation, rewards, done = env.step(actions)
-            print(rewards[1])
+            # print(f"The reward is: {rewards[1]}")
+            # print(type(rewards[1]))
             sum_rewards += rewards[1]
 
             if map.visual:
@@ -74,3 +75,4 @@ def main():
         
 if __name__ == '__main__':
     main()
+ 
