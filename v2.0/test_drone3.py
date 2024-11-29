@@ -45,7 +45,7 @@ def main():
             # Get actions from each drone's actor policy and do these actions in the env.
             for i in range(env.num_drones):
                 observation = torch.tensor(observations[i+1]).float()
-                observation = observation.flatten()
+                #observation = observation.flatten()
                 current_action = agents[i].actor.forward(observation)
                 actions[i] = current_action.detach().numpy()
             
@@ -54,23 +54,21 @@ def main():
             if map.visual:
                 map.update_map(env)
 
-            # Update critic network (Value function).
-            for i in range(env.num_drones):
-                next_observation = torch.tensor(next_observations[i+1]).float()
-                observation = torch.tensor(observations[i+1]).float()
-                next_observation = next_observation.flatten()
-                observation = observation.flatten()
+            # # Update critic network (Value function).
+            # for i in range(env.num_drones):
+            #     next_observation = torch.tensor(next_observations[i+1]).float()
+            #     observation = torch.tensor(observations[i+1]).float()
 
-                next_value = agents[i].critic.forward(next_observation)
-                target = rewards[i] + gamma*next_value
-                errors[i] = target - agents[i].critic.forward(observation)
-                agents[i].critic.update(observation, target)
+            #     next_value = agents[i].critic.forward(next_observation)
+            #     target = rewards[i+1] + gamma*next_value
+            #     errors[i] = target - agents[i].critic.forward(observation)
+            #     agents[i].update_critic(observation, target)
 
             # Update actor network
-            for i in range(num_drones):
-                agents[i].actor.update(observation, errors[i], actions[i])
+            #for i in range(env.num_drones):
+                #agents[i].actor.update(observation, errors[i], actions[i])
 
-            observation = next_observation
+            #observation = next_observation
             
             
             # sum_rewards += rewards
