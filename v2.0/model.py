@@ -27,15 +27,20 @@ class Agent():
             return logits
     
     class Critic(nn.Module):
-        def __init__(self, hidden_dim=16):
+        def __init__(self):
             super().__init__()
-
-            self.hidden = nn.Linear(28, 28)
-            self.output = nn.Linear(hidden_dim, 1)
+            self.hidden1 = nn.Linear(28, 28)
+            self.hidden2 = nn.Linear(28, 16)
+            self.hidden3 = nn.Linear(16, 4)
+            self.output= nn.Linear(4,1)
 
         def forward(self, s):
-            outs = self.hidden(s)
-            outs = F.relu(outs)
+            outs = self.hidden1(s)
+            outs = F.tanh(outs)
+            outs = self.hidden2(outs)
+            outs = F.tanh(outs)
+            outs = self.hidden3(outs)
+            outs = F.tanh(outs)
             value = self.output(outs)
             return value
     

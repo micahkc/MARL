@@ -163,10 +163,17 @@ class Environment():
             
         return observations
 
-    def step(self, actions):
+    def step(self, actions_dict):
+        # {1:[.1,.5], 3:[0.6, 0.7]} -> [[0.1,0.5],[0,0],[0.6, 0.7],[0,0]]
         # updates the enviroment given new control input (check for collisions)
         # return rewards, observations, completion for given action 
         # Update drone positions.
+
+        # Convert actions dictionary to list
+        # Example: {1:[.1,.5], 3:[0.6, 0.7]} -> [[0.1,0.5],[0,0],[0.6, 0.7],[0,0]]
+        actions = [[0,0] for x in range(self.num_drones)]
+        for drone_id in actions_dict:
+            actions[drone_id-1] = actions_dict[drone_id]
         for i,action in enumerate(actions):
             prev_x = self.drones[i].x
             prev_y = self.drones[i].y
