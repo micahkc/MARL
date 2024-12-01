@@ -79,10 +79,7 @@ def add_target():
                                                                              int(num_entry.get())), 
                                                               change_num_targets_label(), 
                                                               target_win.destroy()])
-    button.place(x=10, y=90)
-
-   
-    
+    button.place(x=10, y=90)   
 
 def add_obstacle():
         
@@ -157,7 +154,6 @@ def add_drone():
                                                             change_num_drones_label(), 
                                                             drone_win.destroy()])
     button.place(x=10, y=90)
-
 
 def draw_map():
     global env, root
@@ -242,8 +238,6 @@ def create_default_env2():
         env.add_target(param[0], param[1], param[2], param[3])
 
     return env
-
-
 
 def create_random_env():
     global env
@@ -405,7 +399,8 @@ def create_env():
     return env
 
 
-
+############################################################################################################
+#------------------------------ MAP CLASS DEFINITION ------------------------------------------------------#
 class Map:
     def __init__(self, root, env):
         self.root = root
