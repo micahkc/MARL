@@ -209,7 +209,7 @@ class Environment():
                 # Check for obstacle collision.
                 if self.check_obstacle_collision(drone.x, drone.y, drone.r):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 1
+                    rewards[drone.id] -= 10
                 
                 # Check for drone-drone collision. Compare with other drones, not itself.
                 elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
@@ -232,7 +232,7 @@ class Environment():
                         dead_drones.append(drone)
                                    
                 proximity += proximity_x + proximity_y
-                rewards[drone.id] = proximity * self.reward_boundary
+                rewards[drone.id] += proximity * self.reward_boundary
 
         # we need to set the drones to inactive after we check all collisions
         for drone in dead_drones:

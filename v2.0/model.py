@@ -16,6 +16,9 @@ class Agent():
             self.hidden3 = nn.Linear(16, 8)
             self.output= nn.Linear(8,2)
 
+            logstds_param = nn.Parameter(torch.full((2,), 0.1))
+            self.register_parameter("logstds", logstds_param)
+
         def forward(self, s):
             outs = self.hidden1(s)
             outs = F.tanh(outs)
@@ -23,8 +26,11 @@ class Agent():
             outs = F.tanh(outs)
             outs = self.hidden3(outs)
             outs = F.tanh(outs)
-            logits = self.output(outs)
-            return logits
+            means = self.output(outs)
+
+            stds = torch.clamp(self.logstds.exp(), 1e-3, 50)
+
+            return torch.distributions.Normal(means, stds)
     
     class Critic(nn.Module):
         def __init__(self):
@@ -52,14 +58,37 @@ class Agent():
         self.optimizerA = optim.Adam(self.actor.parameters())
         self.optimizerC = optim.Adam(self.critic.parameters())
 
-    def update_critic(self, observation, target):
+    def update_critic(self, cum_rewards, observations):
         self.optimizerC.zero_grad()
-        self.critic_loss.backward()
+        cum_rewards = torch.tensor(cum_rewards, dtype=torch.float)
+        observations = torch.tensor(observations, dtype = torch.float)
+        values = self.critic.forward(observations)
+        values = values.squeeze(dim=1)
+        loss = F.mse_loss(values, cum_rewards, reduction="none")
+        loss.sum().backward()
         self.optimizerC.step()
+        return values
+    
+    def save_models(self,path):
+        torch.save(self.critic.state_dict(), f"{path}_critic_{self.id}")
+        torch.save(self.actor.state_dict(), f"{path}_actor_{self.id}")
 
-    def update_actor(self, observation, error, action):
+    def load_models(self, path):
+        self.critic.load_state_dict(torch.load(f"{path}_critic_{self.id}", weights_only=True))
+        self.actor.load_state_dict(torch.load(f"path}_actor_{self.id}", weights_only=True))
+
+    def update_actor(self, actions, cum_rewards, values, observations):
         self.optimizerA.zero_grad()
-        self.actor_loss.backward()
+        actions = torch.tensor(actions, dtype=torch.float)
+        observations = torch.tensor(observations, dtype = torch.float)
+        cum_rewards = torch.tensor(cum_rewards, dtype=torch.float)
+        advantage = cum_rewards - values
+        norm_dists = self.actor.forward(observations)
+        logs_probs = norm_dists.log_prob(actions)
+        advantage = torch.unsqueeze(advantage,1)
+        #entropy = norm_dists.entropy().mean()
+        actor_loss = (-logs_probs*advantage.detach()).mean()# - entropy*self.entropy_beta
+        actor_loss.backward()
         self.optimizerA.step()
         
     
