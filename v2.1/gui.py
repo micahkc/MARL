@@ -258,7 +258,7 @@ def create_default_env3():
     for param in obstacle_params:
         env.add_obstacle(param[0], param[1], param[2])
 
-    target_params = [[750, 250, 100, 1]]#, [750, 500, 100, 1]]
+    target_params = [[750, 250, 100, 1], [750, 500, 100, 1]]
     for param in target_params:
         env.add_target(param[0], param[1], param[2], param[3])
 
