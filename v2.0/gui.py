@@ -233,7 +233,7 @@ def create_default_env2():
     for param in obstacle_params:
         env.add_obstacle(param[0], param[1], param[2])
 
-    target_params = [[750, 250, 100, 1], [750, 500, 100, 1]]
+    target_params = [[750, 250, 100, 1]]#, [750, 500, 100, 1]]
     for param in target_params:
         env.add_target(param[0], param[1], param[2], param[3])
 
@@ -497,7 +497,7 @@ class Map:
             else:
                 self.canvas.itemconfig(self.targets[target], fill = RED)
 
-        self.root.after(50)
+        self.root.after(10)
         self.canvas.update()
     
 if __name__ == "__main__":
