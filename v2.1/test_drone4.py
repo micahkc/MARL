@@ -12,7 +12,7 @@ def main():
     num_episodes = 1000
     gamma = 0.999 # Discount factor.
 
-    env = gui.create_random_env2()
+    env = gui.create_random_env2(num_drones=7, num_targets=5, num_obstacles=0)
 
     root = Tk()
     map = gui.Map(root,env)
