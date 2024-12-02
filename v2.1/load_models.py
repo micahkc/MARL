@@ -6,13 +6,17 @@ import matplotlib.pyplot as plt
 # Import from other python modules.
 import gui
 from model import Agent
+import pickle
 def main():
     # Set learning parameters.
     num_episodes = 100
     gamma = 0.8 # Discount factor.
 
-    env = gui.create_default_env2()
+    env = gui.create_default_env3()
 
+    with open('env.pkl', 'rb') as file: 
+        env = pickle.load(file)
+    
     root = Tk()
     map = gui.Map(root,env)
     map.visual = True

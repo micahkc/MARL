@@ -16,7 +16,7 @@ class Target():
         self.r = r
         self.num_agents = num_agents
         self.active = True
-        self.reward = 10
+        self.reward = 1000
 
     def distance(self, obj):
         return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
@@ -209,30 +209,37 @@ class Environment():
                 # Check for obstacle collision.
                 if self.check_obstacle_collision(drone.x, drone.y, drone.r):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 10
+                    rewards[drone.id] -= 100
                 
                 # Check for drone-drone collision. Compare with other drones, not itself.
                 elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 10
+                    rewards[drone.id] -= 100
                                 
                 # Add negative reward if drone is outside of boundary (proportional to distance from edge).
                 # Deactivate the drone if too far outside.
-                proximity_x = 0
-                proximity_y = 0
-                proximity = 0
-                if drone.x < 0 or drone.x > self.width:
-                    proximity_x = min(abs(drone.x), abs(self.width - drone.x))
-                    if proximity_x > self.max_boundary:
-                        dead_drones.append(drone)
+
+                if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
+                    dead_drones.append(drone)
+                    rewards[drone.id] -= 100
+
+                rewards[drone.id] += 0
+
+                # proximity_x = 0
+                # proximity_y = 0
+                # proximity = 0
+                # if drone.x < 0 or drone.x > self.width:
+                #     proximity_x = min(abs(drone.x), abs(self.width - drone.x))
+                #     if proximity_x > self.max_boundary:
+                #         dead_drones.append(drone)
                     
-                if drone.y < 0 or drone.y > self.length:
-                    proximity_y = min(abs(drone.y), abs(self.length - drone.y))
-                    if proximity_y > self.max_boundary:
-                        dead_drones.append(drone)
+                # if drone.y < 0 or drone.y > self.length:
+                #     proximity_y = min(abs(drone.y), abs(self.length - drone.y))
+                #     if proximity_y > self.max_boundary:
+                #         dead_drones.append(drone)
                                    
-                proximity += proximity_x + proximity_y
-                rewards[drone.id] += proximity * self.reward_boundary
+                # proximity += proximity_x + proximity_y
+                # rewards[drone.id] += proximity * self.reward_boundary
 
         # we need to set the drones to inactive after we check all collisions
         for drone in dead_drones:

@@ -81,9 +81,6 @@ def add_target():
                                                               target_win.destroy()])
     button.place(x=10, y=90)
 
-   
-    
-
 def add_obstacle():
         
     global env, obstacle_count_label, root
@@ -157,7 +154,6 @@ def add_drone():
                                                             change_num_drones_label(), 
                                                             drone_win.destroy()])
     button.place(x=10, y=90)
-
 
 def draw_map():
     global env, root
@@ -233,7 +229,7 @@ def create_default_env2():
         env.add_drone(param[0], param[1])
 
 
-    obstacle_params = [[500, 250, 50], [500, 750, 50]]
+    obstacle_params = [[500, 750, 50]]#[500, 250, 50], 
     for param in obstacle_params:
         env.add_obstacle(param[0], param[1], param[2])
 
@@ -243,7 +239,26 @@ def create_default_env2():
 
     return env
 
+def create_default_env3():
+    global env
 
+    # create a default environment
+    env = Environment(1000, 1000)
+
+    drone_params = [[250, 250], [250, 700]]
+    for param in drone_params:
+        env.add_drone(param[0], param[1])
+
+
+    obstacle_params = [[500, 750, 50], [500, 250, 50]]
+    for param in obstacle_params:
+        env.add_obstacle(param[0], param[1], param[2])
+
+    target_params = [[750, 250, 100, 1], [750, 500, 100, 1]]
+    for param in target_params:
+        env.add_target(param[0], param[1], param[2], param[3])
+
+    return env
 
 def create_random_env():
     global env
@@ -254,6 +269,71 @@ def create_random_env():
     num_drones = rand.randint(1,10)
     num_obstacles = rand.randint(1,10)
     num_targets = rand.randint(1,10)
+
+    objects = []
+
+    # randomly add targets
+    for j in range(num_targets):
+        r = rand.randint(1,50)
+        r = 100
+        num_agents = rand.randint(1,5)
+        num_agents = 1
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+r):
+                    overlap = True
+                    break
+
+            if (x+r>env.width) or (x-r<0) or (y+r>env.length) or (y-r<0):
+                overlap = True
+        
+            if not overlap:
+                env.add_target(x,y,r,num_agents)  
+                objects.append(env.targets[-1])
+
+    # randomly add obstacles
+    for j in range(num_obstacles):
+        r = rand.randint(1,50)
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+r):
+                    overlap = True
+                    break
+            if not overlap:
+                env.add_obstacle(x,y,r)
+                objects.append(env.obstacles[-1])
+
+    # randomly add drones
+    for j in range(num_drones):
+        
+        overlap = True
+        while overlap:
+            overlap = False
+            x = rand.randint(0,env.width)
+            y = rand.randint(0,env.length)
+            for obj in objects:
+                if env.distance(x,y,obj.x,obj.y) < (obj.r+env.drone_radius):
+                    overlap = True
+                    break
+            if not overlap:
+                env.add_drone(x,y)
+                objects.append(env.drones[-1])
+
+    return env
+
+def create_random_env2(num_drones = 5, num_targets = 5, num_obstacles = 5):
+    global env
+    
+    # create an enviroment
+    env = Environment(1000, 1000)
 
     objects = []
 
