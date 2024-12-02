@@ -46,6 +46,7 @@ def main():
                 action_dists = agents[drone_id].actor.forward(observation)
                 actions_sampled = action_dists.sample().detach().data.numpy()
                 actions[drone_id] = [actions_sampled[0], actions_sampled[1]]
+                print(actions)
                 
             # Implement these actions in the env.
             next_observations, rewards, done = env.step(actions)

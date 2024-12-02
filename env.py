@@ -58,7 +58,7 @@ class Environment():
 
     def step(self, action):
         # updates the enviroment given new position and velocities (check for collisions)
-        # return rewards observations for given action 
+        # return rewards observations for given action
         if self.visual == True:
             self.update_display()
 

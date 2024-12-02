@@ -27,6 +27,7 @@ class Agent():
             outs = self.hidden3(outs)
             outs = F.tanh(outs)
             means = self.output(outs)
+            #means = F.tanh(outs)
             
 
             stds = torch.clamp(self.logstds.exp(), 1e-3, 50)

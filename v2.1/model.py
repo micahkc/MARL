@@ -16,7 +16,7 @@ class Agent():
             self.hidden3 = nn.Linear(16, 8)
             self.output= nn.Linear(8,2)
 
-            logstds_param = nn.Parameter(torch.full((2,), 0.1))
+            logstds_param = nn.Parameter(torch.full((2,), -0.8))
             self.register_parameter("logstds", logstds_param)
 
         def forward(self, s):

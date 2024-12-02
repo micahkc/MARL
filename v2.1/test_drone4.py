@@ -47,6 +47,7 @@ def main():
                 actions_sampled = action_dists.sample().detach().data.numpy()
                 actions[drone_id] = [actions_sampled[0], actions_sampled[1]]
                 
+                
             # Implement these actions in the env.
             next_observations, rewards, done = env.step(actions)
             

@@ -25,6 +25,7 @@ def main():
         agents[drone_id] = Agent(drone_id)
         agents[drone_id].create_models()
         agents[drone_id].load_models("save1_test")
+        
     
     episode_rewards = []
     # Training loop
@@ -46,6 +47,7 @@ def main():
                 action_dists = agents[drone_id].actor.forward(observation)
                 actions_sampled = action_dists.sample().detach().data.numpy()
                 actions[drone_id] = [actions_sampled[0], actions_sampled[1]]
+                print(actions)
                 
             # Implement these actions in the env.
             next_observations, rewards, done = env.step(actions)
