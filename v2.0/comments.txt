@@ -10,3 +10,21 @@ drone crash only one drone becomes inactive (need to make both inactive) - compl
 
 Model:
 Adjust neural nets
+
+
+#################################################
+Report Stucture:
+
+Main Body:
+1. Intro - Motivation, lit review
+2. Theory
+3. Methods - (what we did)
+4. Results
+5. Conclusion - summary, future work
+
+Appendices
+1. flow chart
+2. architecture - description/codes
+3. division of work
+
+Presentation:

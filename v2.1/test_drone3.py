@@ -8,14 +8,14 @@ import gui
 from model import Agent
 def main():
     # Set learning parameters.
-    num_episodes = 1000
+    num_episodes = 100
     gamma = 0.8 # Discount factor.
 
     env = gui.create_default_env2()
 
     root = Tk()
     map = gui.Map(root,env)
-    map.visual = False
+    map.visual = True
     if not map.visual:
         root.destroy()
 
@@ -84,7 +84,7 @@ def main():
     root.mainloop()
     plt.plot(x,y)
     plt.show()
-
+    
     agents[1].save_models("save1_test")
 if __name__ == '__main__':
     main()

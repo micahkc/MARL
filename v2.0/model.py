@@ -75,7 +75,7 @@ class Agent():
 
     def load_models(self, path):
         self.critic.load_state_dict(torch.load(f"{path}_critic_{self.id}", weights_only=True))
-        self.actor.load_state_dict(torch.load(f"path}_actor_{self.id}", weights_only=True))
+        self.actor.load_state_dict(torch.load(f"{path}_actor_{self.id}", weights_only=True))
 
     def update_actor(self, actions, cum_rewards, values, observations):
         self.optimizerA.zero_grad()

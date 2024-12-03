@@ -16,7 +16,7 @@ class Target():
         self.r = r
         self.num_agents = num_agents
         self.active = True
-        self.reward = 10
+        self.reward = 100
 
     def distance(self, obj):
         return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
@@ -267,7 +267,7 @@ class Environment():
         # Observation is [drone position, drone speed, type of observation, nearest position relative to drone (x,y)]
         observations = self.get_observations()
         
-        print(rewards[1])
+        # print(rewards[1])
         return observations, rewards, done
 
 

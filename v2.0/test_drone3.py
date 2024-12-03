@@ -8,7 +8,7 @@ import gui
 from model import Agent
 def main():
     # Set learning parameters.
-    num_episodes = 100
+    num_episodes = 10000
     gamma = 0.8 # Discount factor.
 
     env = gui.create_default_env2()
