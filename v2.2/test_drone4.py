@@ -3,15 +3,18 @@ from random import randint
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 # Import from other python modules.
 import gui
 from model import Agent
+
 def main():
     # Set learning parameters.
     num_episodes = 1000
     gamma = 0.8 # Discount factor.
 
-    env = gui.create_default_env3()
+    #env = gui.create_default_env3()
+    env = gui.create_random_env2(1, 1, 0)
 
     root = Tk()
     map = gui.Map(root,env)
@@ -37,6 +40,7 @@ def main():
         # Initial Observations
         observations = env.reset()
         
+        step_count = 0
         # Run entire episoide.
         while not done:
             # Get actions from each drone's actor policy for this step.
@@ -60,6 +64,7 @@ def main():
                 actions_history[drone_id].append(actions[drone_id])
                 rewards_history[drone_id].append(rewards[drone_id])
                 observations_history[drone_id].append(next_observations[drone_id])
+            step_count += 1
 
         # Calculate cumulative rewards
         cum_rewards = {x:np.zeros_like(rewards_history[x]) for x in range(1,env.num_drones+1)}
@@ -74,8 +79,8 @@ def main():
             values = agents[drone_id].update_critic(cum_rewards[drone_id], observations_history[drone_id])
             agents[drone_id].update_actor(actions_history[drone_id], cum_rewards[drone_id], values, observations_history[drone_id])
 
-        tot_reward = sum(rewards_history[1])+sum(rewards_history[2])
-        print(f"Episode {i}/{num_episodes} rewards: {tot_reward}")
+        tot_reward = sum(rewards_history[1])
+        print(f"Episode {i}/{num_episodes} rewards: {tot_reward} in {step_count} steps.")
 
         episode_rewards.append(tot_reward)
 
@@ -86,8 +91,12 @@ def main():
     plt.plot(x,y)
     plt.show()
 
+    with open('env.pkl', 'wb') as file: 
+        pickle.dump(env, file)
+
     for drone_id in range(1, env.num_drones+1):
         agents[drone_id].save_models("save1_test")
+        
 if __name__ == '__main__':
     main()
  

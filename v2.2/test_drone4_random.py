@@ -75,7 +75,7 @@ def main():
             agents[drone_id].update_actor(actions_history[drone_id], cum_rewards[drone_id], values, observations_history[drone_id])
 
         tot_reward = sum(rewards_history[1])+sum(rewards_history[2])
-        print(f"Episode {i}/{num_episodes} rewards: {tot_reward}")
+        print(f"Episode {i}/{num_episodes} rewards: {tot_reward} in {i} steps.")
 
         episode_rewards.append(tot_reward)
 

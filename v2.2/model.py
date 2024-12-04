@@ -16,8 +16,10 @@ class Agent():
             self.hidden3 = nn.Linear(16, 8)
             self.output= nn.Linear(8,2)
 
-            logstds_param = nn.Parameter(torch.full((2,), 0.1))
+            logstds_param = nn.Parameter(torch.full((2,), 0.2))
             self.register_parameter("logstds", logstds_param)
+            # self.stds = nn.Parameter(torch.full((2,), 0.1))
+            #self.register_parameter("stds", stds_param)
 
         def forward(self, s):
             outs = self.hidden1(s)
@@ -27,12 +29,12 @@ class Agent():
             outs = self.hidden3(outs)
             outs = F.tanh(outs)
             means = self.output(outs)
+            means = F.tanh(means)
             #means = F.tanh(outs)
             
-
-            stds = torch.clamp(self.logstds.exp(), 1e-3, 50)
-
-            return torch.distributions.Normal(means, stds)
+            self.stds = torch.full((2,), 0.2)
+            #stds = torch.clamp(self.logstds.exp(), 1e-3, 50)
+            return torch.distributions.Normal(means, self.stds)
     
     class Critic(nn.Module):
         def __init__(self):

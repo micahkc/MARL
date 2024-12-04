@@ -16,7 +16,7 @@ class Target():
         self.r = r
         self.num_agents = num_agents
         self.active = True
-        self.reward = 100
+        self.reward = 1000
 
     def distance(self, obj):
         return sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
@@ -102,6 +102,7 @@ class Environment():
         self.ctrl_rate = 0.5 
         self.reward_boundary = -0.1
         self.max_boundary = 100
+        self.max_acceleration = 0.001
         
 
     def add_target(self,x,y,r,num_agents):
@@ -209,21 +210,21 @@ class Environment():
                 # Check for obstacle collision.
                 if self.check_obstacle_collision(drone.x, drone.y, drone.r):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 10
+                    rewards[drone.id] -= 100
                 
                 # Check for drone-drone collision. Compare with other drones, not itself.
                 elif self.check_drone_collision(drone.x, drone.y, drone.r, drone.id):
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 10
+                    rewards[drone.id] -= 100
                                 
                 # Add negative reward if drone is outside of boundary (proportional to distance from edge).
                 # Deactivate the drone if too far outside.
 
                 if drone.x < 0 or drone.x > self.width or drone.y < 0 or drone.y > self.length:
                     dead_drones.append(drone)
-                    rewards[drone.id] -= 10
+                    rewards[drone.id] -= 100
 
-
+                rewards[drone.id] += 0
 
                 # proximity_x = 0
                 # proximity_y = 0
